@@ -461,27 +461,25 @@ class battle:
             print("")
             player_turn_first = False
         
-        # Battle loop
-            while self.player.hp > 0 and self.enc_mob1.hp > 0:
-                if player_turn_first == True:
-            # Player's turn
+        while self.player.hp > 0 and self.enc_mob1.hp > 0:
+            if player_turn_first == True:
                     self.player_turn()
                     self.player_turn_end()
-
+            else:
+                    self.enc_mob1_turn()
+                    self.enc_mob1_turn_end()
             # Check for victory/defeat
-                if self.player.hp <= 0 and self.enc_mob1.hp <= 0:
+            if self.player.hp <= 0 and self.enc_mob1.hp <= 0:
                     print(f"{self.player.name} and {self.enc_mob1.name} have died together...")
                     break
-                elif self.player.hp <= 0:
+            elif self.player.hp <= 0:
                     print(f"{self.player.name} has died...")
                     break
-                elif self.enc_mob1.hp <= 0:
+            elif self.enc_mob1.hp <= 0:
                     print(f"{self.enc_mob1.name} was defeated!!")
                     break
 
-                else:
-                    self.enc_mob1_turn()
-                    self.enc_mob1_turn_end()
+                
 
             # Check for victory/defeat
             if self.player.hp <= 0 and self.enc_mob1.hp <= 0:
@@ -498,5 +496,5 @@ class battle:
             self.player_turn()
             self.player_turn_end()
 
-gorp_encounter = battle(player, enemy1)
+gorp_encounter = battle(player, faggot)
 gorp_encounter.battle_start()
