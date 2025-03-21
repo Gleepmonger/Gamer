@@ -337,7 +337,7 @@ enemy1.enemy_moveset(shit_pants, meow, sitdown, sitdown)
 enemy1.add_status("silly")
 
 faggot = evil("Gayboy", 20, 20, 1, 0, 0, 50000000, THN)
-faggot.enemy_moveset()
+faggot.enemy_moveset(zap, zapper, zappest, shit_pants)
 
 class battle:
     def __init__(self, player, enc_mob1):
