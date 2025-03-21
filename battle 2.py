@@ -31,38 +31,18 @@ heal = ["H", "h"]
 #blunt: 
 #silly:
 
-
-
-class moveset:
-    def __init__(self, move1, move2, move3, move4):
-        self.move1 = move1
-        self.move2 = move2
-        self.move3 = move3
-        self.move4 = move4
-    
-    def has_moves(self):
-        return self.move1 in moveset
-
-    def display_moves(self):
-        print(f"{self.move1}"   f"{self.move2}"
-              f"                    "
-              f"{self.move3}"   f"{self.move4}")
-        pass
-class move:
-    def __init__(attack, atk_name, type, power, status_chance):
-        attack.atk_name = atk_name
-        attack.type = type
-        attack.power = power
-        attack.status_chance = status_chance
-        pass
 class types:
     def __init__(types, type, t_status):
         types.type = type
         types.t_status = t_status
+    def __str__(types):
+        return f"{types.type}"
         pass
 class status_:
     def __init__(status, s_name):
         status.s_name = s_name
+    def __str__(status):
+        return f"{status.s_name}"
         pass
 
 BRN = status_("Burnt")
@@ -81,6 +61,37 @@ SRP = types("Sharp", "")
 BNT = types("Blunt", "")
 SILLY = status_("Silly")
 SIL = types("Silly", SILLY)
+
+class moveset:
+    def __init__(self, move1, move2, move3, move4):
+        self.move1 = move1
+        self.move2 = move2
+        self.move3 = move3
+        self.move4 = move4
+    
+    def has_moves(self):
+        return self.move1 in moveset
+
+    def display_moves(self):
+        print(f"{self.move1}"   f"{self.move2}"
+              f"                    "
+              f"{self.move3}"   f"{self.move4}")
+        pass
+class move:
+    def __init__(attack, atk_name, type, power, status_chance, status_chance_dec):
+        attack.atk_name = atk_name
+        attack.type = type
+        attack.power = power
+        attack.status_chance = status_chance
+        attack.status_chance_dec = status_chance_dec
+    def __str__(attack):
+        return f"{attack.atk_name} {attack.type}, Power: Atk x {attack.power} Effects: {attack.status_chance_dec}"
+        pass
+    def __str__(self):
+        return f"{self.atk_name}, Type: {self.type}, Power: Atk x {self.power}, Effects: {self.status_chance_dec}"
+        pass
+        pass
+
 
 class HealthBar:
     symbol_remaining: str = "█"
@@ -193,9 +204,12 @@ class me:
     def me_has_moves(self):
         return me.me_moveset(self)
 
-    def __str__(self):
-        return str(self.move1) + str(self.move2) + str(self.move3) + str(self.move4)
-        pass
+    def display_moves(self):
+        print("\n" + "=" * 30)
+        print(f"ATTACK!!")
+        print("=" * 30)
+        print(f"1. {self.move1}\n2. {self.move2}\n3. {self.move3}\n4. {self.move4}")
+        print("=" * 30)
 
     
 class evil:
@@ -270,10 +284,10 @@ mobs = {
     evil("Serial Killer", 10, 20, 10, 10, 9, 9, SIL)
 }
 
-incin = move("Incinerate", FIR, 1.2, random.randint(0, 2))
-shit_pants = move("shit pants", SOG, 2, random.randint(0, 0))
-meow = move("Meow", SIL, 0.5, random.randint(0, 255))
-slash = move("Slash", SRP, 1, random.randint(0, 255))
+incin = move("Incinerate", FIR, 1.2, random.randint(0, 2), "33% burn")
+shit_pants = move("shit pants", WTR, 2, random.randint(0, 0), "100% soggy, shits pants :(") 
+meow = move("Meow", SIL, 0.5, random.randint(0, 255), "None")
+slash = move("Slash", SRP, 1, random.randint(0, 255), "None")
 
 
 
@@ -283,12 +297,15 @@ slash = move("Slash", SRP, 1, random.randint(0, 255))
 player = me("Player", 10, 5, 5, 5, 0, 100, 782)
 player.add_status("slorbed")
 player.add_status("moist")
-player.display_status()
 player.me_moveset(incin, shit_pants, meow, slash)
-print(player.__str__())
 
 enemy1 = evil("Slorp", 10, 5, 5, 5, 90, 29, FIR)
 enemy1.add_status("silly")
-enemy1.display_status()
 
-
+class battle:
+    def __init__(self, player, enc_mob1, enc_mob2, enc_mob3):
+        self.player = player
+        self.enc_mob1 = enc_mob1
+        self.enc_mob2 = enc_mob2
+        self.enc_mob3 = enc_mob3
+        pass
