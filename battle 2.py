@@ -3,8 +3,8 @@ import os
 
 #dictionary :3
 
-correct = ["Yes", "yes", "y"]
-incorrect = ["No", "no", "n"]
+correct = ["Yes", "yes", "y", "Y"]
+incorrect = ["No", "no", "n", "N"]
 fight = ["A", "a"]
 check = ["C", "c"]
 heal = ["H", "h"]
@@ -44,6 +44,11 @@ class status_:
     def __str__(status):
         return f"{status.s_name}"
         pass
+def calculate_multiplier(multipliers):
+    result = 1.0
+    for multiplier in multipliers:
+        result *= multiplier
+    return result
 
 BRN = status_("Burnt")
 FIR = types("Fire", BRN)
@@ -141,8 +146,8 @@ class me:
         self.exp = exp
         self.exp_tonext = exp_tonext
         self.status = []
-        self.strength = []
-        self.weakness = []
+        self.strength = [1]
+        self.weakness = [1]
         self.health_bar = HealthBar(self, color="green")
         pass
     def add_status(self, status):
@@ -183,9 +188,11 @@ class me:
             self.weakness.append(SRP, POI)
             self.strength.append(SIL)
     
-    def attack(self, target) -> None:
+    def player_attack(self, target) -> None:
         target.hp -= damage
-        damage = (((((2 * self.lvl)/5)+2) * ((self.atk)/(target.defn))/50)+2) * self.strength * target.weakness * random.randrange(0.85, 1)
+        strength_multiplier = calculate_multiplier(self.player.strength)
+        weakness_multiplier = calculate_multiplier(self.enc_mob1.weakness)
+        damage = (((((2 * self.lvl)/5)+2) * ((self.atk)/(target.defn))/50)+2) * strength_multiplier * weakness_multiplier * random.uniform(0.85, 1)
         target.hp = max(target.hp, 0)
         target.health_bar.update()
         print(f"{self.name} dealt {damage} damage to"
@@ -225,8 +232,8 @@ class evil:
         enemy.exp_give = exp_give
         enemy.type = type
         enemy.status = []
-        enemy.strength = []
-        enemy.weakness = []
+        enemy.strength = [1]
+        enemy.weakness = [1]
         enemy.health_bar = HealthBar(enemy, color="red")
         pass
     def add_status(enemy, status):
@@ -267,13 +274,35 @@ class evil:
             enemy.weakness.append(SRP, POI)
             enemy.strength.append(SIL)
     
-    def attack(enemy) -> None:
+    def enemy_attack(enemy) -> None:
         player.hp -= damage
-        damage = (((((2 * enemy.lvl)/5)+2) * ((enemy.atk)/(enemy.defn))/50)+2) * enemy.strength * player.weakness * random.randrange(0.85, 1)
+        damage = (((((2 * enemy.lvl)/5)+2) * ((enemy.atk)/(enemy.defn))/50)+2) * enemy.strength * player.weakness * random.uniform(0.85, 1)
         player.hp = max(player.hp, 0)
         player.health_bar.update()
         print(f"{enemy.name} dealt {damage} damage to"
               f"{player.name}!")
+    
+    def enemy_moveset(enemy, 
+                   move1, 
+                   move2, 
+                   move3, 
+                   move4):
+        enemy.move1 = move1
+        enemy.move2 = move2
+        enemy.move3 = move3
+        enemy.move4 = move4 
+
+    def enemy_has_moves(enemy):
+        return evil.enemy_moveset(enemy)
+
+    def display_moves(enemy):
+        print("\n" + "=" * 30)
+        print(f"CHECK: {enemy.name}")
+        print("=" * 30)
+        print(f"1. {enemy.move1}\n2. {enemy.move2}\n3. {enemy.move3}\n4. {enemy.move4}")
+        print("=" * 30)
+        evil.display_status(enemy)
+        print("=" * 30)
     pass
 
 e_list = ["Femboy", "Boykisser", "Serial Killer"]
@@ -288,6 +317,12 @@ incin = move("Incinerate", FIR, 1.2, random.randint(0, 2), "33% burn")
 shit_pants = move("shit pants", WTR, 2, random.randint(0, 0), "100% soggy, shits pants :(") 
 meow = move("Meow", SIL, 0.5, random.randint(0, 255), "None")
 slash = move("Slash", SRP, 1, random.randint(0, 255), "None")
+sitdown = move("Sit down", BNT, 0, random.randint(1, 2), "Sat")
+
+zap = move("Shock", THN, 1.2, random.randint(0, 3), "25% shock")
+zapper = move("Thunderbolt", THN, 1.75, random.randint(0, 3), "25% shock")
+zappest = move("Raiden", THN, 2, random.randint(0, 2), "33% shock")
+
 
 
 
@@ -295,17 +330,173 @@ slash = move("Slash", SRP, 1, random.randint(0, 255), "None")
 #I am going to KILL MYSELF
 
 player = me("Player", 10, 5, 5, 5, 0, 100, 782)
-player.add_status("slorbed")
-player.add_status("moist")
 player.me_moveset(incin, shit_pants, meow, slash)
 
-enemy1 = evil("Slorp", 10, 5, 5, 5, 90, 29, FIR)
+enemy1 = evil("Slorp", 10, 4, 3, 6, 90, 29, FIR)
+enemy1.enemy_moveset(shit_pants, meow, sitdown, sitdown)
 enemy1.add_status("silly")
 
+faggot = evil("Gayboy", 20, 20, 1, 0, 0, 50000000, THN)
+faggot.enemy_moveset()
+
 class battle:
-    def __init__(self, player, enc_mob1, enc_mob2, enc_mob3):
+    def __init__(self, player, enc_mob1):
         self.player = player
         self.enc_mob1 = enc_mob1
-        self.enc_mob2 = enc_mob2
-        self.enc_mob3 = enc_mob3
+    def player_turn_end(self):
+        return self.enc_mob1_turn()
+    def enc_mob1_turn_end(self):
+        return self.player_turn()
+    def player_turn(self):
+        self.choice = input("==============================\n"
+                            "What will you do?\n"
+                            "==============================\n"
+                            "Attack (A)\n"
+                            "==============================\n"
+                            "Check (C)\n"
+                            "==============================\n"
+                            "Heal (H)\n"
+                            "==============================\n")
+        
+        
+        
+        if self.choice in fight:
+            self.player.display_moves()
+            attack_choice = input(f"Attack!! (1, 2, 3, 4) or go back (N)... ")
+            if attack_choice == "1":
+                selected_move = self.player.move1
+            elif attack_choice == "2":
+                selected_move = self.player.move2
+            elif attack_choice == "3":
+                selected_move = self.player.move3
+            elif attack_choice == "4":
+                selected_move = self.player.move4
+            elif attack_choice in incorrect:
+                print("You decided to go back.")
+                return self.player_turn()
+            else:
+                print("Come on...")
+                return self.player_turn()
+            strength_multiplier = calculate_multiplier(self.player.strength)
+            weakness_multiplier = calculate_multiplier(self.enc_mob1.weakness)
+            damage = (((((2 * self.player.lvl) / 5) + 2) * selected_move.power * (self.player.atk / self.enc_mob1.defn)) / 50 + 2) * strength_multiplier * weakness_multiplier * random.uniform(0.85, 1)
+            damage = max(1, int(damage))
+
+            self.enc_mob1.hp -= damage
+            self.enc_mob1.hp = max(self.enc_mob1.hp, 0)  # Prevent negative HP
+            self.enc_mob1.health_bar.update()
+
+            print("")
+            print(f"{self.player.name} used {selected_move.atk_name}!")
+            print(f"{self.enc_mob1.name} took {damage} damage from {selected_move.atk_name}!")
+            print("")
+
+        elif self.choice in check:
+            self.enc_mob1.display_moves()
+        
+        elif self.choice in heal:
+            healing = (1/8 * player.hp_max) * random.uniform(0.7, 1)
+            healing = max(1, int(healing))
+            player.hp += healing
+            self.player.hp =min(self.player.hp, self.player.hp_max)
+            player.health_bar.update()    
+    def enc_mob1_turn(self):
+        does_attack = random.randrange(0, 5, 1)
+        if does_attack == 0:
+            selected_move = self.enc_mob1.move1
+            strength_multiplier = calculate_multiplier(self.enc_mob1.strength)
+            weakness_multiplier = calculate_multiplier(self.player.weakness)
+            damage = (((((2 * self.enc_mob1.lvl) / 5) + 2) * selected_move.power * ((self.enc_mob1.atk)/(player.defn)) / 50) + 2) * strength_multiplier * weakness_multiplier * random.uniform(0.85, 1)
+            damage = max(1, int(damage))
+            player.hp -= damage
+            player.hp = max(player.hp, 0)
+            player.health_bar.update()
+            print(f"{self.enc_mob1.name} used {selected_move.atk_name}\n"
+                  f"{player.name} took {damage} damage!\n")
+        elif does_attack == 1:
+            selected_move = self.enc_mob1.move2
+            strength_multiplier = calculate_multiplier(self.enc_mob1.strength)
+            weakness_multiplier = calculate_multiplier(self.player.weakness)
+            damage = (((((2 * self.enc_mob1.lvl) / 5) + 2) * selected_move.power * ((self.enc_mob1.atk)/(player.defn)) / 50) + 2) * strength_multiplier * weakness_multiplier * random.uniform(0.85, 1)
+            damage = max(1, int(damage))
+            player.hp -= damage
+            player.hp = max(player.hp, 0)
+            player.health_bar.update()
+            print(f"{self.enc_mob1.name} used {selected_move.atk_name}\n"
+                  f"{player.name} took {damage} damage!\n")
+        elif does_attack == 2:
+            selected_move = self.enc_mob1.move3
+            strength_multiplier = calculate_multiplier(self.enc_mob1.strength)
+            weakness_multiplier = calculate_multiplier(self.player.weakness)
+            damage = (((((2 * self.enc_mob1.lvl) / 5) + 2) * selected_move.power * ((self.enc_mob1.atk)/(player.defn)) / 50) + 2) * strength_multiplier * weakness_multiplier * random.uniform(0.85, 1)
+            damage = max(1, int(damage))
+            player.hp -= damage
+            player.hp = max(player.hp, 0)
+            player.health_bar.update()
+            print(f"{self.enc_mob1.name} used {selected_move.atk_name}\n"
+                  f"{player.name} took {damage} damage!\n")
+        elif does_attack == 3:
+            selected_move = self.enc_mob1.move4
+            strength_multiplier = calculate_multiplier(self.enc_mob1.strength)
+            weakness_multiplier = calculate_multiplier(self.player.weakness)
+            damage = (((((2 * self.enc_mob1.lvl) / 5) + 2) * selected_move.power * ((self.enc_mob1.atk)/(player.defn)) / 50) + 2) * strength_multiplier * weakness_multiplier * random.uniform(0.85, 1)
+            damage = max(1, int(damage))
+            player.hp -= damage
+            player.hp = max(player.hp, 0)
+            player.health_bar.update()
+            print(f"{self.enc_mob1.name} used {selected_move.atk_name}\n"
+                  f"{player.name} took {damage} damage!\n")
+        else:
+            print(f"{self.enc_mob1.name} hesitated...")
+
         pass
+    
+    def battle_start(self):
+        if self.player.spd >= self.enc_mob1.spd:
+            print(f"You encounter the {self.enc_mob1.name}!")
+            print("")
+            player_turn_first = True
+        else:
+            print(f"{self.enc_mob1.name} attacks!")
+            print("")
+            player_turn_first = False
+        
+        # Battle loop
+            while self.player.hp > 0 and self.enc_mob1.hp > 0:
+                if player_turn_first == True:
+            # Player's turn
+                    self.player_turn()
+                    self.player_turn_end()
+
+            # Check for victory/defeat
+                if self.player.hp <= 0 and self.enc_mob1.hp <= 0:
+                    print(f"{self.player.name} and {self.enc_mob1.name} have died together...")
+                    break
+                elif self.player.hp <= 0:
+                    print(f"{self.player.name} has died...")
+                    break
+                elif self.enc_mob1.hp <= 0:
+                    print(f"{self.enc_mob1.name} was defeated!!")
+                    break
+
+                else:
+                    self.enc_mob1_turn()
+                    self.enc_mob1_turn_end()
+
+            # Check for victory/defeat
+            if self.player.hp <= 0 and self.enc_mob1.hp <= 0:
+                        print(f"{self.player.name} and {self.enc_mob1.name} have died together...")
+                
+            elif self.player.hp <= 0:
+                        print(f"{self.player.name} has died...")
+
+            elif self.enc_mob1.hp <= 0:
+                        print(f"{self.enc_mob1.name} was defeated!!")
+                
+
+            # Player's turn
+            self.player_turn()
+            self.player_turn_end()
+
+gorp_encounter = battle(player, enemy1)
+gorp_encounter.battle_start()
